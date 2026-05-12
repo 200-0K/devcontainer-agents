@@ -26,6 +26,12 @@ echo '{"gemini": "ok"}'   > "$HOST_HOME_MOCK/.gemini/oauth_creds.json"
 echo '{"codex":  "ok"}'   > "$HOST_HOME_MOCK/.codex/auth.json"
 echo '{"oc":     "ok"}'   > "$HOST_HOME_MOCK/.local/share/opencode/auth.json"
 
+# Mock host shell rc with a sentinel alias (the "ccc" use case).
+echo "alias ccc='echo claude-code'" > "$HOST_HOME_MOCK/.zshrc"
+
+# Seed an existing container .bashrc to verify guard + idempotent append.
+echo "# pre-existing line" > "$CTR_HOME_MOCK/.bashrc"
+
 # Pretend host path is something different to verify path rewriting.
 echo "host path marker: $HOST_HOME_MOCK" > "$HOST_HOME_MOCK/.claude/marker.json"
 
@@ -62,6 +68,33 @@ if grep -q "$CTR_HOME_MOCK" "$CTR_HOME_MOCK/.claude/marker.json" \
 else
   echo "  FAIL — host path still present or container path missing" >&2
   cat "$CTR_HOME_MOCK/.claude/marker.json" >&2
+  exit 1
+fi
+
+echo
+echo "Host shell rc bridge check:"
+if [ -f "$CTR_HOME_MOCK/.shellrc.host" ] \
+   && grep -q "alias ccc=" "$CTR_HOME_MOCK/.shellrc.host" \
+   && grep -q ".shellrc.host" "$CTR_HOME_MOCK/.bashrc"; then
+  echo "  ok (~/.shellrc.host present, .bashrc sources it)"
+else
+  echo "  FAIL — shell rc bridge incomplete" >&2
+  ls -la "$CTR_HOME_MOCK/" >&2
+  exit 1
+fi
+
+echo
+echo "Idempotent re-sync (no duplicate source line):"
+# Re-seed (sync deleted the staging) and run again
+mkdir -p "$WS/.devcontainer/.host-files"
+echo "$HOST_HOME_MOCK" > "$WS/.devcontainer/.host-files/.host-home-path"
+cp "$HOST_HOME_MOCK/.zshrc" "$WS/.devcontainer/.host-files/.zshrc"
+HOME="$CTR_HOME_MOCK" DCA_WORKSPACE="$WS" "$HERE/run.sh" sync >/dev/null
+count=$(grep -c ".shellrc.host" "$CTR_HOME_MOCK/.bashrc")
+if [ "$count" -eq 1 ]; then
+  echo "  ok (source line present exactly once)"
+else
+  echo "  FAIL — source line count: $count" >&2
   exit 1
 fi
 

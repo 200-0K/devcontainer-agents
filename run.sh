@@ -22,6 +22,7 @@ case "$cmd" in
   init)
     mkdir -p "$HOST_FILES"
     printf '%s\n' "$HOME" > "$HOST_FILES/.host-home-path"
+    stage_host_shell_rcs
     load_and_run_agents "$SCRIPT_DIR" init
     log INFO "init complete -> $HOST_FILES"
     ;;
@@ -40,6 +41,7 @@ case "$cmd" in
     CONTAINER_HOME="$HOME"
     export HOST_HOME CONTAINER_HOME
     load_and_run_agents "$SCRIPT_DIR" sync
+    restore_host_shell_rcs
     rewrite_host_paths "$HOME"
     rm -rf "$HOST_FILES"
     log INFO "sync complete"

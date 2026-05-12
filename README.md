@@ -4,11 +4,13 @@ Drop-in AI coding-agent setup for any VS Code devcontainer. One file per project
 
 ## What you get
 
-| Lifecycle hook       | Subcommand | Where     | What runs                                                  |
-| -------------------- | ---------- | --------- | ---------------------------------------------------------- |
-| `initializeCommand`  | `init`     | host      | stage `~/.claude*`, `~/.gemini`, `~/.codex`, etc. into the workspace |
-| `postCreateCommand`  | `install`  | container | install enabled agent CLIs (curl-bash and `npm i -g`)      |
-| `postAttachCommand`  | `sync`     | container | restore staged auth into `$HOME`, delete staging           |
+| Lifecycle hook       | Subcommand | Where     | What runs                                                                                  |
+| -------------------- | ---------- | --------- | ------------------------------------------------------------------------------------------ |
+| `initializeCommand`  | `init`     | host      | stage `~/.claude*`, `~/.gemini`, `~/.codex`, `~/.zshrc`, etc. into the workspace            |
+| `postCreateCommand`  | `install`  | container | install enabled agent CLIs (curl-bash and `npm i -g`)                                       |
+| `postAttachCommand`  | `sync`     | container | restore staged auth into `$HOME`, copy host shell rc to `~/.shellrc.host`, delete staging   |
+
+Your host's `~/.zshrc` (or `~/.bashrc`) is staged as `~/.shellrc.host` inside the container, and `~/.bashrc`/`~/.zshrc` is wired to source it — so aliases and functions like `ccc` defined on the host keep working. Host-specific commands that can't run inside the container are swallowed silently by `2>/dev/null || true`.
 
 ## Onboard a project
 
