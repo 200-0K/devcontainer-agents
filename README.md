@@ -15,14 +15,11 @@ Your host's `~/.zshrc` (or `~/.bashrc`) is staged as `~/.shellrc.host` inside th
 ## Onboard a project
 
 ```bash
-# remote (after pushing this repo to GitHub):
-curl -fsSL https://raw.githubusercontent.com/<USER>/devcontainer-agents/main/install.sh | bash
-
-# local (from this checkout):
-bash install.sh /path/to/your/project
+cd /path/to/your/project
+curl -fsSL https://raw.githubusercontent.com/200-0k/devcontainer-agents/main/install.sh | bash
 ```
 
-Writes `.devcontainer/agents.sh` into your project and prints a JSON snippet to merge into `devcontainer.json`.
+Writes `.devcontainer/agents.sh` into your project, scaffolds `devcontainer.json` if missing, or prints a snippet to merge if it already exists. Reopen the container.
 
 ## Per-project footprint
 
@@ -47,14 +44,19 @@ Default: all four agents on.
 
 See [docs/adding-an-agent.md](docs/adding-an-agent.md). It's two files touched: drop `agents/<name>.sh` and append the name to `agents/manifest.txt`. Every project picks it up on the next reopen.
 
-## Local testing
+## Testing changes to this repo
 
 ```bash
-bash test/smoke.sh                              # tmp-dir round trip for init+sync
-DCA_LOCAL=$PWD bash install.sh /path/to/project # wire the project to this checkout
+bash test/smoke.sh   # tmp-dir round trip for init+sync (no network)
 ```
 
-In the project's `containerEnv`, set `"DCA_LOCAL": "/path/inside/container"` if you also bind-mount this repo into the container — the shim will skip the tarball fetch.
+To try an unreleased branch in a real project, override the tarball URL in your host shell before reopening the container:
+
+```bash
+export DCA_REPO_TARBALL='https://codeload.github.com/200-0k/devcontainer-agents/tar.gz/my-branch'
+```
+
+For container-side hooks, set the same env in the project's `containerEnv`.
 
 ## Repo layout
 

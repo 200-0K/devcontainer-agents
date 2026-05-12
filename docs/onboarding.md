@@ -3,7 +3,7 @@
 ## TL;DR
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/<USER>/devcontainer-agents/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/200-0k/devcontainer-agents/main/install.sh | bash
 ```
 
 Run from the project root. Writes `.devcontainer/agents.sh`, prints a snippet to paste into `devcontainer.json`. Reopen the container.
@@ -50,25 +50,12 @@ The shim reads `$PWD`. Dev Containers CLI sets that to `workspaceFolder` for eve
 }
 ```
 
-## Testing against an unreleased version
+## Pointing the shim at a fork or branch
 
-Bind-mount this repo into your container and set `DCA_LOCAL`:
+Override the tarball URL by exporting `DCA_REPO_TARBALL` in the host shell before opening the container (it inherits into `initializeCommand`):
 
-```yaml
-# compose.local.yml (or compose.override.yml)
-services:
-  php:
-    volumes:
-      - /absolute/path/to/devcontainer-agents:/dca-local:ro
+```bash
+export DCA_REPO_TARBALL='https://codeload.github.com/me/devcontainer-agents/tar.gz/my-branch'
 ```
 
-```jsonc
-// devcontainer.json
-"containerEnv": {
-  "DCA_LOCAL": "/dca-local"
-}
-```
-
-On the host side, just `export DCA_LOCAL=/absolute/path/to/devcontainer-agents` before opening the container — `initializeCommand` runs in your host shell and inherits it.
-
-The shim takes `DCA_LOCAL` over the tarball fetch.
+For container-side hooks, add the same env to `containerEnv`.

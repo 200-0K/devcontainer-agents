@@ -8,14 +8,14 @@
   "postAttachCommand": "./.devcontainer/agents.sh sync",
 
   "containerEnv": {
-    "CLAUDE_CODE_OAUTH_TOKEN": "${localEnv:CLAUDE_CODE_OAUTH_TOKEN}"__DCA_LOCAL_ENV__
+    "CLAUDE_CODE_OAUTH_TOKEN": "${localEnv:CLAUDE_CODE_OAUTH_TOKEN}"
     // Per-project agent toggles. Default on; uncomment to disable.
     // "ENABLE_CLAUDE":   "0",
     // "ENABLE_OPENCODE": "0",
     // "ENABLE_GEMINI":   "0",
     // "ENABLE_CODEX":    "0"
   },
-__DCA_LOCAL_MOUNT__
+
   "customizations": {
     "vscode": {
       "extensions": [
