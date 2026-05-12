@@ -1,0 +1,26 @@
+// Scaffolded by devcontainer-agents. https://aka.ms/devcontainer.json
+{
+  "name": "__PROJECT_NAME__",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+
+  "initializeCommand": "./.devcontainer/agents.sh init",
+  "postCreateCommand": "./.devcontainer/agents.sh install && ./.devcontainer/project-setup.sh",
+  "postAttachCommand": "./.devcontainer/agents.sh sync",
+
+  "containerEnv": {
+    "CLAUDE_CODE_OAUTH_TOKEN": "${localEnv:CLAUDE_CODE_OAUTH_TOKEN}"__DCA_LOCAL_ENV__
+    // Per-project agent toggles. Default on; uncomment to disable.
+    // "ENABLE_CLAUDE":   "0",
+    // "ENABLE_OPENCODE": "0",
+    // "ENABLE_GEMINI":   "0",
+    // "ENABLE_CODEX":    "0"
+  },
+__DCA_LOCAL_MOUNT__
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Anthropic.claude-code"
+      ]
+    }
+  }
+}
