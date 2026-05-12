@@ -3,7 +3,7 @@
 # Override the URL by exporting DCA_REPO_TARBALL.
 set -euo pipefail
 
-REPO_TARBALL="${DCA_REPO_TARBALL:-https://codeload.github.com/200-0k/devcontainer-agents/tar.gz/main}"
+REPO_TARBALL="${DCA_REPO_TARBALL:-https://codeload.github.com/200-0K/devcontainer-agents/tar.gz/main}"
 
 T=$(mktemp -d)
 trap 'rm -rf "$T"' EXIT

@@ -1,74 +1,68 @@
 # devcontainer-agents
 
-Drop-in AI coding-agent setup for any VS Code devcontainer. One file per project; all logic lives here.
+Drop-in AI coding-agent setup for any VS Code devcontainer. One shim per project; all logic lives here.
 
-## What you get
-
-| Lifecycle hook       | Subcommand | Where     | What runs                                                                                  |
-| -------------------- | ---------- | --------- | ------------------------------------------------------------------------------------------ |
-| `initializeCommand`  | `init`     | host      | stage `~/.claude*`, `~/.gemini`, `~/.codex`, `~/.zshrc`, etc. into the workspace            |
-| `postCreateCommand`  | `install`  | container | install enabled agent CLIs (curl-bash and `npm i -g`)                                       |
-| `postAttachCommand`  | `sync`     | container | restore staged auth into `$HOME`, copy host shell rc to `~/.shellrc.host`, delete staging   |
-
-Your host's `~/.zshrc` (or `~/.bashrc`) is staged as `~/.shellrc.host` inside the container, and `~/.bashrc`/`~/.zshrc` is wired to source it — so aliases and functions like `ccc` defined on the host keep working. Host-specific commands that can't run inside the container are swallowed silently by `2>/dev/null || true`.
+Supported agents: Claude Code, OpenCode, Gemini CLI, Codex.
 
 ## Onboard a project
 
+From your project root:
+
 ```bash
-cd /path/to/your/project
-curl -fsSL https://raw.githubusercontent.com/200-0k/devcontainer-agents/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/200-0K/devcontainer-agents/main/install.sh | bash
 ```
 
-Writes `.devcontainer/agents.sh` into your project, scaffolds `devcontainer.json` if missing, or prints a snippet to merge if it already exists. Reopen the container.
+Writes `.devcontainer/agents.sh` (5-line shim) and either scaffolds a new `devcontainer.json` or auto-injects the lifecycle keys into an existing one (with a `.dca.bak` backup). Reopen the container.
 
-## Per-project footprint
+## What it does on each container lifecycle
 
-```
-.devcontainer/
-└── agents.sh            # 5-line shim, never edited
-```
+| Hook                | Subcommand | Where     | What runs                                                                                |
+| ------------------- | ---------- | --------- | ---------------------------------------------------------------------------------------- |
+| `initializeCommand` | `init`     | host      | stage `~/.claude*`, `~/.gemini`, `~/.codex`, `~/.zshrc`, etc. into the workspace          |
+| `postCreateCommand` | `install`  | container | install enabled agent CLIs (curl-bash and `npm i -g`)                                     |
+| `postAttachCommand` | `sync`     | container | restore staged auth into `$HOME`, copy host shell rc to `~/.shellrc.host`, delete staging |
 
-Plus three lifecycle lines and `containerEnv.CLAUDE_CODE_OAUTH_TOKEN` in `devcontainer.json`. That's all.
+Your host's `~/.zshrc` (or `~/.bashrc`) is bridged into the container as `~/.shellrc.host` and sourced from `~/.bashrc` / `~/.zshrc`, so aliases like `ccc` defined on the host keep working. Host-specific commands that can't run in the container are swallowed silently.
 
-## Toggling agents per project
+## Toggle an agent off in one project
+
+In that project's `devcontainer.json`:
 
 ```jsonc
 "containerEnv": {
-  "ENABLE_CODEX": "0"   // disable Codex for this project
+  "ENABLE_CODEX": "0"
 }
 ```
 
-Default: all four agents on.
+Default: all agents on.
 
-## Adding a new agent
+## Add a new agent
 
-See [docs/adding-an-agent.md](docs/adding-an-agent.md). It's two files touched: drop `agents/<name>.sh` and append the name to `agents/manifest.txt`. Every project picks it up on the next reopen.
+Two files touched. See [docs/adding-an-agent.md](docs/adding-an-agent.md).
 
-## Testing changes to this repo
-
-```bash
-bash test/smoke.sh   # tmp-dir round trip for init+sync (no network)
-```
-
-To try an unreleased branch in a real project, override the tarball URL in your host shell before reopening the container:
+## Test changes to this repo
 
 ```bash
-export DCA_REPO_TARBALL='https://codeload.github.com/200-0k/devcontainer-agents/tar.gz/my-branch'
+bash test/smoke.sh      # init + sync round trip
+bash test/install.sh    # onboarder behavior
 ```
 
-For container-side hooks, set the same env in the project's `containerEnv`.
+To try an unreleased branch in a real project, override the tarball URL in your host shell before reopening the container, and mirror it in `containerEnv`:
+
+```bash
+export DCA_REPO_TARBALL='https://codeload.github.com/200-0K/devcontainer-agents/tar.gz/my-branch'
+```
 
 ## Repo layout
 
 ```
-run.sh                       # dispatcher
-install.sh                   # project onboarder
-lib/common.sh                # log, stage_path, restore_*, npm_install_global, agent_enabled
-lib/loader.sh                # manifest reader + per-agent dispatch
-agents/manifest.txt          # one agent id per line
-agents/<name>.sh             # <name>_init / <name>_install / <name>_sync
-templates/agents.sh          # shim that gets dropped into each project
-templates/devcontainer.snippet.jsonc
+run.sh                                   # dispatcher
+install.sh                               # project onboarder
+lib/{common,loader}.sh                   # helpers + manifest reader
+agents/manifest.txt                      # one agent id per line
+agents/<name>.sh                         # <name>_init / _install / _sync hooks
+templates/agents.sh                      # shim dropped into each project
+templates/devcontainer.{full,snippet}.jsonc
 docs/{adding-an-agent,onboarding}.md
-test/smoke.sh
+test/{lib,smoke,install}.sh
 ```
