@@ -44,6 +44,10 @@ echo "Staged into $WS/.devcontainer/.host-files:"
 find "$WS/.devcontainer/.host-files" -type f | sed "s|$TMP|<TMP>|g"
 
 echo
+# Simulate `install` creating ~/.claude before sync (the real claude installer does this).
+mkdir -p "$CTR_HOME_MOCK/.claude"
+echo "pre-existing container file" > "$CTR_HOME_MOCK/.claude/install-marker"
+
 echo "==> sync (simulated CONTAINER)"
 HOME="$CTR_HOME_MOCK" DCA_WORKSPACE="$WS" "$HERE/run.sh" sync
 
@@ -58,6 +62,26 @@ if [ -d "$WS/.devcontainer/.host-files" ]; then
   exit 1
 else
   echo "  ok"
+fi
+
+echo
+echo "No nested dir check (no ~/.claude/.claude):"
+if [ -d "$CTR_HOME_MOCK/.claude/.claude" ]; then
+  echo "  FAIL — nested ~/.claude/.claude exists" >&2
+  exit 1
+else
+  echo "  ok"
+fi
+
+echo
+echo "Merge preserves pre-existing container files:"
+if [ -f "$CTR_HOME_MOCK/.claude/install-marker" ] \
+   && [ -f "$CTR_HOME_MOCK/.claude/settings.json" ]; then
+  echo "  ok (install-marker kept, host settings.json restored)"
+else
+  echo "  FAIL — merge dropped a file" >&2
+  ls -la "$CTR_HOME_MOCK/.claude/" >&2
+  exit 1
 fi
 
 echo

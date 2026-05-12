@@ -38,14 +38,22 @@ restore_file_secret() {
   chmod 600 "$dst" 2>/dev/null || true
 }
 
-# Copy a file/dir tree from $HOST_FILES into $HOME at REL_DST. No-op if missing.
+# Copy a file/dir tree from $HOST_FILES into $HOME at REL_DST.
+# Dirs: contents are MERGED into dst (existing dst preserved, files overwritten).
+# Files: dst is overwritten.
 restore_path() {
   local rel="$1"
   local src="$HOST_FILES/$rel"
   [ -e "$src" ] || return 0
   local dst="$HOME/$rel"
-  mkdir -p "$(dirname "$dst")"
-  cp -rf "$src" "$dst"
+  if [ -d "$src" ]; then
+    mkdir -p "$dst"
+    # `src/.` merges contents — avoids nesting when dst already exists.
+    cp -rf "$src"/. "$dst"/
+  else
+    mkdir -p "$(dirname "$dst")"
+    cp -f "$src" "$dst"
+  fi
 }
 
 # In-place sed wrapper. GNU sed: `sed -i EXPR FILE`. BSD/macOS sed: `sed -i '' EXPR FILE`.
