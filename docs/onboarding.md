@@ -3,7 +3,7 @@
 ## TL;DR
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/200-0K/devcontainer-agents/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/200-0K/devcontainer-agents/master/install.sh | bash
 ```
 
 Run from the project root. Writes `.devcontainer/agents.sh`, prints a snippet to paste into `devcontainer.json`. Reopen the container.

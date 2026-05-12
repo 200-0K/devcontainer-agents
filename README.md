@@ -9,7 +9,7 @@ Supported agents: Claude Code, OpenCode, Gemini CLI, Codex.
 From your project root:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/200-0K/devcontainer-agents/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/200-0K/devcontainer-agents/master/install.sh | bash
 ```
 
 Writes `.devcontainer/agents.sh` (5-line shim) and either scaffolds a new `devcontainer.json` or auto-injects the lifecycle keys into an existing one (with a `.dca.bak` backup). Reopen the container.

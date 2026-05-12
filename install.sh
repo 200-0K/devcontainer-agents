@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Onboard a project.
 #
-#   curl -fsSL https://raw.githubusercontent.com/200-0K/devcontainer-agents/main/install.sh | bash
-#   curl -fsSL https://raw.githubusercontent.com/200-0K/devcontainer-agents/main/install.sh | bash -s -- /path/to/project
+#   curl -fsSL https://raw.githubusercontent.com/200-0K/devcontainer-agents/master/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/200-0K/devcontainer-agents/master/install.sh | bash -s -- /path/to/project
 #
 # Behavior:
 #   - Writes .devcontainer/agents.sh                 (always)
@@ -20,7 +20,7 @@ DEVC_DIR="$PROJECT_DIR/.devcontainer"
 DEVC_FILE="$DEVC_DIR/devcontainer.json"
 SELF_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd || echo "")"
 
-REPO_RAW="${DCA_REPO_RAW:-https://raw.githubusercontent.com/200-0K/devcontainer-agents/main}"
+REPO_RAW="${DCA_REPO_RAW:-https://raw.githubusercontent.com/200-0K/devcontainer-agents/master}"
 
 LIFECYCLE_KEYS=(initializeCommand postCreateCommand postAttachCommand)
 OAUTH_TOKEN_LINE='"CLAUDE_CODE_OAUTH_TOKEN": "${localEnv:CLAUDE_CODE_OAUTH_TOKEN}"'
