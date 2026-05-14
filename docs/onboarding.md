@@ -13,11 +13,7 @@ Run from the project root. Writes `.devcontainer/agents.sh`, prints a snippet to
 ```jsonc
 "initializeCommand": "./.devcontainer/agents.sh init",
 "postCreateCommand": "./.devcontainer/agents.sh install && ./.devcontainer/project-setup.sh",
-"postAttachCommand": "./.devcontainer/agents.sh sync",
-
-"containerEnv": {
-  "CLAUDE_CODE_OAUTH_TOKEN": "${localEnv:CLAUDE_CODE_OAUTH_TOKEN}"
-}
+"postAttachCommand": "./.devcontainer/agents.sh sync"
 ```
 
 ## Existing lifecycle commands
