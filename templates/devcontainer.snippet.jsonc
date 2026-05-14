@@ -1,24 +1,8 @@
 // Merge into your .devcontainer/devcontainer.json.
-// If you already have init/postCreate/postAttach commands, move their bodies into
-// .devcontainer/project-setup.sh (etc.) and chain them as shown.
+// If you already have init/postCreate/postAttach commands, chain the agents.sh
+// calls with your existing ones (e.g. "./.devcontainer/agents.sh install && <yours>").
 {
   "initializeCommand": "./.devcontainer/agents.sh init",
-  "postCreateCommand": "./.devcontainer/agents.sh install && ./.devcontainer/project-setup.sh",
-  "postAttachCommand": "./.devcontainer/agents.sh sync",
-
-  // Per-project agent toggles. Default is on; uncomment to disable.
-  // "containerEnv": {
-  //   "ENABLE_CLAUDE":   "0",
-  //   "ENABLE_OPENCODE": "0",
-  //   "ENABLE_GEMINI":   "0",
-  //   "ENABLE_CODEX":    "0"
-  // },
-
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "Anthropic.claude-code"
-      ]
-    }
-  }
+  "postCreateCommand": "./.devcontainer/agents.sh install",
+  "postAttachCommand": "./.devcontainer/agents.sh sync"
 }

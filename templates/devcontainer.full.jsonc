@@ -4,22 +4,6 @@
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
 
   "initializeCommand": "./.devcontainer/agents.sh init",
-  "postCreateCommand": "./.devcontainer/agents.sh install && ./.devcontainer/project-setup.sh",
-  "postAttachCommand": "./.devcontainer/agents.sh sync",
-
-  // Per-project agent toggles. Default on; uncomment to disable.
-  // "containerEnv": {
-  //   "ENABLE_CLAUDE":   "0",
-  //   "ENABLE_OPENCODE": "0",
-  //   "ENABLE_GEMINI":   "0",
-  //   "ENABLE_CODEX":    "0"
-  // },
-
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "Anthropic.claude-code"
-      ]
-    }
-  }
+  "postCreateCommand": "./.devcontainer/agents.sh install",
+  "postAttachCommand": "./.devcontainer/agents.sh sync"
 }

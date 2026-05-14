@@ -15,7 +15,6 @@ mkdir -p "$P"
 quiet bash "$INSTALL" "$P"
 
 assert_exec  "$P/.devcontainer/agents.sh"           "agents.sh written + executable"
-assert_exec  "$P/.devcontainer/project-setup.sh"    "project-setup.sh stub written"
 assert_file  "$P/.devcontainer/devcontainer.json"   "devcontainer.json scaffolded"
 assert_grep  '"name": "greenfield"' "$P/.devcontainer/devcontainer.json" "PROJECT_NAME substituted"
 assert_grep  '"initializeCommand"'  "$P/.devcontainer/devcontainer.json" "lifecycle keys present"
@@ -44,7 +43,7 @@ assert_valid_jsonc                        "$P/.devcontainer/devcontainer.json" "
 
 # -----------------------------------------------------------------------
 echo
-echo "==> case 3: existing containerEnv → don't add a second one"
+echo "==> case 3: existing containerEnv is preserved alongside lifecycle injection"
 P="$TMP/case3"
 mkdir -p "$P/.devcontainer"
 cat > "$P/.devcontainer/devcontainer.json" <<'EOF'
@@ -58,7 +57,7 @@ cat > "$P/.devcontainer/devcontainer.json" <<'EOF'
 EOF
 quiet bash "$INSTALL" "$P"
 
-assert_grep_count '"containerEnv"' "$P/.devcontainer/devcontainer.json" 1 "single containerEnv block"
+assert_grep_count '"containerEnv"' "$P/.devcontainer/devcontainer.json" 1 "no duplicate containerEnv key"
 assert_grep       '"MY_VAR": "1"'  "$P/.devcontainer/devcontainer.json"   "existing containerEnv preserved"
 assert_grep       '"initializeCommand"' "$P/.devcontainer/devcontainer.json" "lifecycle keys still injected"
 assert_valid_jsonc                 "$P/.devcontainer/devcontainer.json"   "result is valid JSON"

@@ -12,26 +12,16 @@ Run from the project root. Writes `.devcontainer/agents.sh`, prints a snippet to
 
 ```jsonc
 "initializeCommand": "./.devcontainer/agents.sh init",
-"postCreateCommand": "./.devcontainer/agents.sh install && ./.devcontainer/project-setup.sh",
+"postCreateCommand": "./.devcontainer/agents.sh install",
 "postAttachCommand": "./.devcontainer/agents.sh sync"
 ```
 
 ## Existing lifecycle commands
 
-If your `devcontainer.json` already has `postCreateCommand` etc., move its body into `.devcontainer/project-setup.sh` and chain it as shown. Example for a Laravel project that previously ran `composer install && php artisan storage:link`:
-
-```bash
-# .devcontainer/project-setup.sh
-#!/usr/bin/env bash
-set -e
-composer install
-php artisan storage:link -q
-```
-
-Then in `devcontainer.json`:
+If your `devcontainer.json` already has `postCreateCommand` etc., chain the agents.sh call with yours. Example for a Laravel project that previously ran `composer install && php artisan storage:link`:
 
 ```jsonc
-"postCreateCommand": "./.devcontainer/agents.sh install && ./.devcontainer/project-setup.sh"
+"postCreateCommand": "./.devcontainer/agents.sh install && composer install && php artisan storage:link -q"
 ```
 
 ## /app vs /workspace vs anything else

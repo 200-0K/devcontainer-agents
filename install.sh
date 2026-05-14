@@ -6,7 +6,6 @@
 #
 # Behavior:
 #   - Writes .devcontainer/agents.sh                 (always)
-#   - Writes .devcontainer/project-setup.sh stub     (if missing)
 #   - Writes .devcontainer/devcontainer.json         (if missing — full scaffold)
 #   - Otherwise: auto-injects the lifecycle keys into the existing
 #     devcontainer.json when there are no conflicts; backs up to
@@ -24,7 +23,7 @@ REPO_RAW="${DCA_REPO_RAW:-https://raw.githubusercontent.com/200-0K/devcontainer-
 
 LIFECYCLE_KEYS=(initializeCommand postCreateCommand postAttachCommand)
 LIFECYCLE_BLOCK='  "initializeCommand": "./.devcontainer/agents.sh init",
-  "postCreateCommand": "./.devcontainer/agents.sh install && ./.devcontainer/project-setup.sh",
+  "postCreateCommand": "./.devcontainer/agents.sh install",
   "postAttachCommand": "./.devcontainer/agents.sh sync"'
 
 # Prefer SELF_DIR's copy of REL when present (running from a clone), else curl.
@@ -91,8 +90,7 @@ inject_before_root_close() {
 print_manual_merge() {
   echo "skip    auto-merge ($1)"
   echo
-  echo "Merge by hand. To run agents alongside your existing commands, move the"
-  echo "existing postCreate body into .devcontainer/project-setup.sh and chain it."
+  echo "Merge by hand. Chain the agents.sh calls with your existing commands."
   echo "----------------------------------------"
   fetch templates/devcontainer.snippet.jsonc
   echo "----------------------------------------"
@@ -103,19 +101,6 @@ mkdir -p "$DEVC_DIR"
 fetch templates/agents.sh > "$DEVC_DIR/agents.sh"
 chmod +x "$DEVC_DIR/agents.sh"
 echo "wrote   $DEVC_DIR/agents.sh"
-
-if [ ! -f "$DEVC_DIR/project-setup.sh" ]; then
-  cat > "$DEVC_DIR/project-setup.sh" <<'EOF'
-#!/usr/bin/env bash
-# Project-specific postCreate steps. Runs after agent CLIs are installed.
-# Put your composer/npm/build/etc. commands here.
-set -e
-EOF
-  chmod +x "$DEVC_DIR/project-setup.sh"
-  echo "wrote   $DEVC_DIR/project-setup.sh (stub)"
-else
-  echo "kept    $DEVC_DIR/project-setup.sh (already present)"
-fi
 
 if [ ! -f "$DEVC_FILE" ]; then
   TEMPLATE="$(fetch templates/devcontainer.full.jsonc)"
